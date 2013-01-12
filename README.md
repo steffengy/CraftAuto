@@ -1,5 +1,5 @@
 CraftAuto
--------------------
+=======
 
 Have you ever been tired of crafting?
 Then this is the solution!
