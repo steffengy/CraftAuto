@@ -241,7 +241,7 @@ public class EasyCraft
 	
 	public static ItemStack[] resolveIngredients(EasyRecipe receipe)
 	{
-		ItemStack[] arr = new ItemStack[8];
+		ItemStack[] arr = new ItemStack[9];
 		int arrC = 0;
 		for(int c = 0; c < receipe.getIngredientsSize(); c++)
 		{

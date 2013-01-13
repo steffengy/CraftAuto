@@ -37,13 +37,22 @@ public class RecipeHelper {
     public static void scanRecipes() {
         long beforeTime = System.nanoTime();
 
-        boolean forge = true;
+        boolean forge = true, ic2 = true, unknown = false;
+        //Forge
         try {
         	 Class.forName("net.minecraftforge.oredict.ShapedOreRecipe");
         } 
         catch( ClassNotFoundException e )
         {
         	forge = false; 
+        }
+        //IC2
+        try{
+        	Class.forName("ic2.core.AdvRecipe");
+        }
+        catch(ClassNotFoundException e)
+        {
+        	ic2 = false;
         }
         
         List mcRecipes = CraftingManager.getInstance().getRecipeList();
@@ -56,6 +65,7 @@ public class RecipeHelper {
         	widthSlots = 3;
             IRecipe r = (IRecipe) mcRecipes.get(i);
             ArrayList ingredients = null;
+            
             if (r instanceof ShapedRecipes) {
             	ItemStack[] input = EasyCraft.<ItemStack[], ShapedRecipes> getPrivateValue(ShapedRecipes.class, (ShapedRecipes) r, 2);
                 ingredients = new ArrayList(Arrays.asList(input));
@@ -63,7 +73,9 @@ public class RecipeHelper {
             } else if (r instanceof ShapelessRecipes) {
             	List input = EasyCraft.<List, ShapelessRecipes> getPrivateValue(ShapelessRecipes.class, (ShapelessRecipes) r, 1);
                 ingredients = new ArrayList(input);
-            } else 
+            } 
+            else 
+            {
             	if(forge)
             	{
             		if (r instanceof net.minecraftforge.oredict.ShapedOreRecipe) {
@@ -73,21 +85,38 @@ public class RecipeHelper {
             		} else if (r instanceof net.minecraftforge.oredict.ShapelessOreRecipe) {
             			List input = EasyCraft.<List, net.minecraftforge.oredict.ShapelessOreRecipe> getPrivateValue(net.minecraftforge.oredict.ShapelessOreRecipe.class, (net.minecraftforge.oredict.ShapelessOreRecipe) r, 1);
             			ingredients = new ArrayList(input);
+            		} 
+            		else
+            		{
+            			unknown = true;
+            		} 
+            	}
+            
+            	if (ic2 && unknown)
+            	{
+            		if(r instanceof ic2.core.AdvRecipe)
+            		{
+            			ingredients = new ArrayList(Arrays.asList(((ic2.core.AdvRecipe)r).input));
+            			widthSlots = ((ic2.core.AdvRecipe)r).inputWidth;
+            			unknown = false;
+            		}
+            		else if(r instanceof ic2.core.AdvShapelessRecipe)
+            		{
+            			ingredients = new ArrayList(Arrays.asList(((ic2.core.AdvShapelessRecipe)r).input));
+            			unknown = false;
             		}
             		else
             		{
-            			// It's a special recipe (map extending, armor dyeing, ...) - ignore
-                		// Add to list for mod compatibility handling
-            			unknownRecipes.add(r);
-                		continue;
+            			unknown = true;
             		}
-            	
-            	} else {
-            		// It's a special recipe (map extending, armor dyeing, ...) - ignore
-            		// Add to list for mod compatibility handling
-            		unknownRecipes.add(r);
-            		continue;
             	}
+            }
+            
+            if(unknown)
+            {
+            	unknownRecipes.add(r);
+            	continue;
+            }
             tmp.add(new EasyRecipe(EasyItemStack.fromItemStack(r.getRecipeOutput()), ingredients, widthSlots));
         }
 
