@@ -62,6 +62,7 @@ public class RecipeHelper {
         int widthSlots = 3;
         
         for (int i = 0; i < mcRecipes.size(); i++) {
+        	unknown = false;
         	widthSlots = 3;
             IRecipe r = (IRecipe) mcRecipes.get(i);
             ArrayList ingredients = null;
