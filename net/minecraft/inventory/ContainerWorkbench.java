@@ -49,6 +49,7 @@ public class ContainerWorkbench extends Container
     public InventoryBasic inventory = new InventoryBasic("tmp", 8*5);
     public EntityPlayer thePlayer;
     private Timer timer;
+    private float last = 0.0F;
 
     public ContainerWorkbench(InventoryPlayer par1InventoryPlayer, World par2World, int par3, int par4, int par5)
     {
@@ -266,11 +267,25 @@ public class ContainerWorkbench extends Container
  		{
 	 		if(mouseButton != 1 && shiftIsDown == 0)
 	 		{
-	 			requestSingle((SlotEasyCraft)inventorySlots.get(slotIndex)); 
+	 			SlotEasyCraft sE = (SlotEasyCraft) inventorySlots.get(slotIndex);
+	 			if(sE.getIRecipe() != null)
+	 			{
+	 				if(RecipeHelper.canCraft(sE.getIRecipe(), thePlayer.inventory))
+	 					requestSingle(sE);
+	 				populateSlotsWithRecipes();
+	 				updateVisibleSlots(last);
+	 			}
 	 		}
 	 		else
 	 		{
-	 			requestMultiple((SlotEasyCraft)inventorySlots.get(slotIndex));
+	 			SlotEasyCraft sE = (SlotEasyCraft) inventorySlots.get(slotIndex);
+	 			if(sE.getIRecipe() != null)
+	 			{
+	 				if(RecipeHelper.canCraft(sE.getIRecipe(), thePlayer.inventory))
+	 					requestMultiple(sE); 
+	 				populateSlotsWithRecipes();
+	 				updateVisibleSlots(last);
+	 			}
 	 		}
 	 		return null;
  		}

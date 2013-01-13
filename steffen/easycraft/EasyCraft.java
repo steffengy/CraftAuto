@@ -258,7 +258,9 @@ public class EasyCraft
 					++arrC;
 				}
 			else if(receipe.getIngredient(c) == null)
+			{
 				++arrC;
+			}
 		}
 		return arr;
 	}
@@ -401,7 +403,7 @@ public class EasyCraft
 				else
 					available = player.inventory.getInventoryStackLimit();
 				//save
-				//if(multiPlayer)
+				if(multiPlayer)
 					click(output, winId(), 0, 0, 0, player);
 
 				if(player.inventory.getStackInSlot(slots.get(c)) != null)
@@ -415,11 +417,11 @@ public class EasyCraft
 				}
 				output.stackSize = sZ;
 				//merge with this slot
-				//if(multiPlayer)
+				if(multiPlayer)
 					click(output, winId(), slot, 0, 0, player);
 				//@GUI: save new stack size
 				player.inventory.setInventorySlotContents(slots.get(c), output.copy());
-				if(multiPlayer)
+				if(!multiPlayer)
 					getSPPlayerOnServer().inventory.setInventorySlotContents(slots.get(c), output.copy());
 				//set stackSize back
 				output.stackSize = left2;

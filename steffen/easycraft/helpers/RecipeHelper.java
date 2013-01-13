@@ -65,6 +65,8 @@ public class RecipeHelper {
         	unknown = false;
         	widthSlots = 3;
             IRecipe r = (IRecipe) mcRecipes.get(i);
+            if(r.getRecipeOutput() == null)
+            	continue;
             ArrayList ingredients = null;
             
             if (r instanceof ShapedRecipes) {
@@ -432,6 +434,7 @@ public class RecipeHelper {
         		return 0;
         	else if(o1 == null || o2 == null)
         		return 1;
+        	
             if (o1.getResult().getID() > o2.getResult().getID()) {
                 return 1;
             } else if (o1.getResult().getID() < o2.getResult().getID()) {
