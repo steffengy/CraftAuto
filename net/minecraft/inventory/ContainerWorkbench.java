@@ -10,13 +10,16 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import steffen.easycraft.EasyCraft;
 import steffen.easycraft.InventoryEasyCraft;
 import steffen.easycraft.SlotEasyCraft;
+import steffen.easycraft.datatypes.EasyItemStack;
 import steffen.easycraft.datatypes.EasyRecipe;
 import steffen.easycraft.helpers.RecipeHelper;
 
@@ -607,18 +610,39 @@ public class ContainerWorkbench extends Container
  		EasyRecipe irecipe = slot.getIRecipe();
  		if(irecipe == null)
  			return false;
- 		int max = 0;
+ 		int max = 64;
+ 		boolean found = false;
+ 		HashMap<EasyItemStack, Integer> cache = new HashMap<EasyItemStack, Integer>();
+ 		
  		for(ItemStack t : EasyCraft.resolveIngredients(irecipe))
  		{
- 			if(t != null && t.stackSize > max)
+ 			found = false;
+ 			for(Map.Entry<EasyItemStack, Integer> i : cache.entrySet())
+ 			{
+ 				if(t != null)
+ 				{
+ 					if(i.getKey().equals(EasyItemStack.fromItemStack(t), true))
+ 					{
+ 						i.setValue(i.getValue() + 1);
+ 						found = true;
+ 					}
+ 				}
+ 			}
+ 			if(!found && t != null)
+ 				cache.put(EasyItemStack.fromItemStack(t), 1);
+ 			if(t != null && (slot.inventory.getInventoryStackLimit() / t.stackSize) < max)
  				max = slot.inventory.getInventoryStackLimit() / t.stackSize;
+ 		}
+ 		for(Map.Entry<EasyItemStack, Integer> ii : cache.entrySet())
+ 		{
+ 			if((slot.inventory.getInventoryStackLimit() / ii.getValue()) < max)
+ 				max = slot.inventory.getInventoryStackLimit() / ii.getValue();
  		}
  		//Apply recipe
  		for(int c = 0; c < max; c++)
  		{
- 			if(!RecipeHelper.canCraft(irecipe, this.thePlayer.inventory))
- 				break;
- 			requestSingle(slot);
+ 			if(RecipeHelper.canCraft(slot.getIRecipe(), this.thePlayer.inventory))
+ 				requestSingle(slot);
  		}
  		return true;
  	}

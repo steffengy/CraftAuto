@@ -138,7 +138,7 @@ public class EasyCraft
 					if(slot <= 8)
 						slot += 37;
 					else
-						slot += 10; /* 9 crafting + 1 result */
+						slot += 1; /* anything above 8 is possible, 9 = possible, 10 = first field */
 					ItemStack source = d.getStackInSlot(realSlot);
 
 					boolean useHoleStack = false;
@@ -280,17 +280,6 @@ public class EasyCraft
 		
 		for(int c = 0; c < arr.length; c++)
 		{
-			// 0 -> 8 = hotbar
-			// 8 -> 40 = other stuff
-			/*
-			 *  windowclick - 1,37,0,0
- 				Packet 102 - WindowClick - 1,37,0,0, 1xtile.log@0
- 				windowclick - 1,1,0,0
- 				Packet 102 - WindowClick - 1,1,0,0, null
- 				windowclick - 1,0,0,0
- 				Packet 102 - WindowClick - 1,0,0,0, 4xtile.wood@0
-			 */
-
 			++craftingSlot;
 			if(arr[c] == null)
 				continue;
@@ -367,7 +356,7 @@ public class EasyCraft
 						if(slot <= 8)
 							slot += 37;
 						else
-							slot += 10; /* 9 crafting + 1 result */
+							slot += 1; /* anything above 8 is possible, 9 = possible, 10 = first field */
 						/* end_import */
 						click(output, winId(), 0, 0, 0, player);
 						click(null /* i write anything to slot */ , winId(), slot, 0, 0, player);
@@ -384,6 +373,8 @@ public class EasyCraft
 		}
 		else
 		{
+			if(multiPlayer)
+				click(output, winId(), 0, 0, 0, player);
 			/* Append to slots */
 			for(int c = 0; c < slots.size(); c++)
 			{
@@ -394,7 +385,7 @@ public class EasyCraft
 					if(slot <= 8)
 						slot += 37;
 					else
-						slot += 10; /* 9 crafting + 1 result */
+						slot += 1; /* anything above 8 is possible, 9 = possible, 10 = first field */
 					/* end_import */
 				}
 				//get available size
@@ -403,8 +394,6 @@ public class EasyCraft
 				else
 					available = player.inventory.getInventoryStackLimit();
 				//save
-				if(multiPlayer)
-					click(output, winId(), 0, 0, 0, player);
 
 				if(player.inventory.getStackInSlot(slots.get(c)) != null)
 					sZ = player.inventory.getStackInSlot(slots.get(c)).stackSize + output.stackSize;
@@ -416,13 +405,20 @@ public class EasyCraft
 					sZ = 64;
 				}
 				output.stackSize = sZ;
+				ItemStack ddd = player.inventory.getStackInSlot(slots.get(c));
+				
 				//merge with this slot
 				if(multiPlayer)
-					click(output, winId(), slot, 0, 0, player);
+					click(ddd.copy(), winId(), slot, 0, 0, player);
 				//@GUI: save new stack size
-				player.inventory.setInventorySlotContents(slots.get(c), output.copy());
+				ItemStack guiStack = output.copy();
+
+				if(guiStack.stackSize == 0)
+					guiStack = null;
+				
+				player.inventory.setInventorySlotContents(slots.get(c), guiStack);
 				if(!multiPlayer)
-					getSPPlayerOnServer().inventory.setInventorySlotContents(slots.get(c), output.copy());
+					getSPPlayerOnServer().inventory.setInventorySlotContents(slots.get(c), guiStack);
 				//set stackSize back
 				output.stackSize = left2;
 				/* we don't need a break; we have it in the loop populating slots */
