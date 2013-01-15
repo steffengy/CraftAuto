@@ -49,7 +49,7 @@ public class ContainerWorkbench extends Container
     
     public InventoryEasyCraft craftableRecipes;
     private List recipeList;
-    public InventoryBasic inventory = new InventoryBasic("tmp", 8*5);
+    public InventoryBasic inventory = new InventoryBasic("tmp", true, 8*5);
     public EntityPlayer thePlayer;
     private Timer timer;
     private float last = 0.0F;
